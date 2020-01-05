@@ -2,3 +2,7 @@ parameters.nls
 greens.nls
 Warbot.nlogo
 .DS_Store
+*.swp
+*.aux
+*.out
+*.log

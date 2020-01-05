@@ -1,0 +1,83 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage[scale=0.7]{geometry}
+\pagenumbering{gobble}
+
+\begin{document}
+
+\begin{table}[ht]
+	Memory assignments for all robots\\
+	\begin{tabular}{|c|l|}
+		\hline
+		Memory & Description\\
+		\hline
+		Mem 0 a & Current State\\
+		Mem 0 b & Time since last state change\\
+		\hline
+		Mem 1 a & Base x\\
+		Mem 1 b & Base y\\
+		\hline
+		Mem 2 a & Robot type dependant\\
+		Mem 2 b & Robot type dependant\\
+		\hline
+		Mem 3 a & Robot type dependant\\
+		Mem 3 b & Robot type dependant\\
+		\hline
+		Mem 4 a & Robot type dependant\\
+		Mem 4 b & Robot type dependant\\
+		\hline
+		Mem 5 a & Robot type dependant\\
+		Mem 5 b & Robot type dependant\\
+		\hline
+	\end{tabular}
+\end{table}
+
+\section{Explorers behaviour}
+
+\begin{table}[ht]
+	Memory assignments for explorers\\
+	\begin{tabular}{|c|l|}
+		\hline
+		Memory & Description\\
+		\hline
+		Mem 2 a & Last closest ennemy RocketLauncher position x\\
+		Mem 2 b & Last closest ennemy RocketLauncher position y\\
+		\hline
+		Mem 3 a & Last closest friend RocketLauncher position x\\
+		Mem 3 b & Last closest friend RocketLauncher position y\\
+		\hline
+		Mem 4 a & Last resource or Explorer knowing resource position x\\
+		Mem 4 b & Last resource or Explorer knowing resource position y\\
+		\hline
+		Mem 5 a & Knows resource or Explorer position\\
+		Mem 5 b & Resource type\\
+		\hline
+	\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+	State array\\
+	\begin{tabular}{|c|l|}
+		\hline
+		State & Description \\
+		\hline
+		0 & Wandering : goes in random directions, while trying to dodge objects\\
+		\hline
+		1 & Antenna : relays information to nearby wandering harvesters\\
+		\hline
+		2 & Fleeing : try to go away from nearby closest ennemy while\\
+		& trying to reach closest friend RocketLauncher or Base\\
+		\hline
+	\end{tabular}
+\end{table}
+
+\section{Harvesters behaviour}
+
+\section{Bases behaviour}
+
+\section{RocketLaunchers behaviour}
+
+\end{document}

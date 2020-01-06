@@ -287,7 +287,7 @@ to goRedHarvester
         ]
       ][ ifelse (item 0 mem0 = 2) [
         ;; bring back the resource to the base : they know where to find the food !
-        tom-move-back-to-base
+        let temp tom-move-back-to-base
         ][ if (item 0 mem0 = 3) [
           ;; farming :
           ;; go near base, on an empty plot

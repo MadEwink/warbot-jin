@@ -117,7 +117,44 @@ to red-team-shoot
   
 end
 
+to tom-explorer-get-food-info [ robot ]
+  if ( [breed] of robot = Explorers OR [breed] of robot = Harvesters )
+  [
+    if ( item 0 [mem0] of robot = 1)
+    [
+      set mem0 list 1 0
+      set mem1 [mem1] of robot
+    ]
+  ]
+end
+
 to goRedExplorer
+  print mem1
+  let friend-robots [self] of perceive-robots color
+  if (item 0 mem0 = 0)
+  [
+    while [free-ahead? explorer-speed != NOBODY]
+    [
+      set heading random 360
+    ]
+    forward-move explorer-speed
+    let foods perceive-food
+    if (any? foods)
+    [
+      let food min-one-of foods [distance myself]
+      set mem0 list 1 0
+      let foodx [xcor] of food
+      let foody [ycor] of food
+      set mem1 list foodx foody
+    ]
+    foreach friend-robots
+    [
+      robot -> tom-explorer-get-food-info robot
+    ]
+  ]
+  if (item 0 mem0 = 1)
+  [
+  ]
   
 end
 
@@ -152,6 +189,7 @@ end
 ;; procedure pour initialiser les explorers rouges
 to initRedExplorer
   set mem0 list 0 0
+  set mem1 list 0 0
 end
 
 ;; procedure pour initialiser les rocket-launchers rouges
@@ -160,6 +198,8 @@ end
 
 ;; procedure pour initialiser les rocket-launchers rouges
 to initRedHarvester
+  set mem0 list 0 0
+  set mem1 list 0 0
 end
 
 ;; procedure pour initialiser les bases rouges

@@ -163,6 +163,42 @@ to goRedRocketLauncher
 end
 
 to goRedHarvester
+  ;; switch case on the state of self
+  ;; 0 Wandering : goes in random directions, while trying to dodge objects
+  ;; 1 Collecting : goes to a resource location known or indicated by an Explorer
+  ;; 2 Retrieving : brings a resource bask to the base
+  ;; 3 Farming : Plant seeds and harvest seeds around base
+
+  ifelse (item 0 mem0 = 0) [
+    ;; use the random dir of MadEwink
+  ][ ifelse (item 0 mem0 = 1) [
+      ;; collecting resources
+      
+      let b min-one-of perceive-food [ distance self ]
+      ;; if resource in range :
+      ifelse (b != nobody)[
+        take-food b
+        ;; switch to state 2, to return to base
+        set mem0 replace-item 0 mem1 2
+      ][
+        ;; else :
+        let tempx item 0 mem1
+        let tempy item 1 mem1
+        facexy tempx tempy
+        ;;set heading towards angle-to-base
+        ;; may collide with a wall
+        forward-move speed
+      ]
+    ][ ifelse (item 0 mem0 = 2) [
+        ;; bring back the resource to the base : they know where to find the food !
+        red-team-go-back-to-base
+      ][ if (item 0 mem0 = 3) [
+          ;; farming
+        ]
+      ]
+    ]
+  ]
+  
 end
 
 to goRedBase

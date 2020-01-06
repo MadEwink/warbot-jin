@@ -6,3 +6,4 @@ Warbot.nlogo
 *.aux
 *.out
 *.log
+.Warbot.tmp.nlogo

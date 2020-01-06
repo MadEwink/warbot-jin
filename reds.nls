@@ -167,5 +167,6 @@ to initRedBase
   tom-init-parameters
   
   new-Harvester self
-  set mem1 list [tom-init-nbr-harvesters - 1] [tom-init-nbr-explorers]
+  let temp1 tom-init-nbr-harvesters - 1
+  set mem1 list temp1 tom-init-nbr-explorers
 end

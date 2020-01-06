@@ -187,6 +187,8 @@ to goRedHarvester
 
   ifelse (item 0 mem0 = 0) [
     ;; use the random dir of MadEwink
+    tom-move-random-direction speed
+    ;; TODO switch to other state
   ][ ifelse (item 0 mem0 = 1) [
       ;; collecting resources
       
@@ -202,7 +204,7 @@ to goRedHarvester
         let tempy item 1 mem1
         facexy tempx tempy
         ;;set heading towards angle-to-base
-        ;; may collide with a wall
+        ;; TODO may collide with a wall
         forward-move speed
       ]
     ][ ifelse (item 0 mem0 = 2) [

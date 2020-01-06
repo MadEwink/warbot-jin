@@ -123,16 +123,20 @@ to goRedHarvester
 end
 
 to goRedBase
-  if (item 0 mem1 > 0)
+  ;; produces a robot
+  ifelse (item 0 mem1 > 0)
   [
     new-Harvester self
     replace-item 0 mem1 [item 0 mem1 - 1]
   ]
-  if (item 1 mem1 > 0)
   [
-    new-Explorer self
-    replace-item 1 mem1 [item 1 mem1 - 1]
+  if (item 1 mem1 > 0)
+    [
+      new-Explorer self
+      replace-item 1 mem1 [item 1 mem1 - 1]
+    ]
   ]
+  
 end
 
 ;; procedure pour initialiser les explorers rouges
@@ -151,6 +155,5 @@ end
 ;; procedure pour initialiser les bases rouges
 to initRedBase
   new-Harvester self
-  new-Explorer self
-  set mem1 list [tom-init-nbr-harvesters - 1] [tom-init-nbr-explorers - 1]
+  set mem1 list [tom-init-nbr-harvesters - 1] [tom-init-nbr-explorers]
 end

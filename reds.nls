@@ -118,6 +118,7 @@ to red-team-shoot
 end
 
 to tom-explorer-get-food-info [ robot ]
+  ;;if the robot is an explorer or harvester, and it has found food, update self state
   if ( [breed] of robot = Explorers OR [breed] of robot = Harvesters )
   [
     if ( item 0 [mem0] of robot = 1)
@@ -128,25 +129,40 @@ to tom-explorer-get-food-info [ robot ]
   ]
 end
 
+to tom-move-random-direction
+  set heading random 360
+  while [free-ahead? speed != NOBODY]
+  [
+    set heading random 360
+  ]
+  forward-move speed
+end
+
 to goRedExplorer
-  print mem1
+  ;;find nearby friend robots
   let friend-robots [self] of perceive-robots color
+  ;; switch case on the state of self
+  ;; 0 Wandering : goes in random directions, while trying to dodge objects
+  ;; 1 Returns to base
+  ;; 2 Find enemy base
+  ;; 3 Return to base
+  ;; 4 Suicide squad
   if (item 0 mem0 = 0)
   [
-    while [free-ahead? explorer-speed != NOBODY]
-    [
-      set heading random 360
-    ]
-    forward-move explorer-speed
+    ;;move in a random direction avoiding obstacles
+    tom-move-random-direction
+    ;;find food
     let foods perceive-food
     if (any? foods)
     [
+      ;;register food location and switch to state 1
       let food min-one-of foods [distance myself]
       set mem0 list 1 0
       let foodx [xcor] of food
       let foody [ycor] of food
       set mem1 list foodx foody
     ]
+    ;;find explorer or harvester knowing food location
     foreach friend-robots
     [
       robot -> tom-explorer-get-food-info robot

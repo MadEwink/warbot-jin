@@ -132,13 +132,13 @@ to goRedHarvester
   ;; 2 Retrieving : brings a resource bask to the base
   ;; 3 Farming : Plant seeds and harvest seeds around base
 
-  ifelse (item 0 mem0 == 0) [
+  ifelse (item 0 mem0 = 0) [
     ;; use the random dir of MadEwink
-  ][ ifelse (item 0 mem0 == 1) [
+  ][ ifelse (item 0 mem0 = 1) [
       ;; collecting resources
-    ][ ifelse (item 0 mem0 == 2) [
+    ][ ifelse (item 0 mem0 = 2) [
         ;; bring back the resource to life
-      ][ ifelse (item 0 mem0 == 3) [
+      ][ ifelse (item 0 mem0 = 3) [
           ;; farming
         ]
     ]

@@ -8,6 +8,25 @@
 
 \begin{document}
 
+\section{Strategy}
+
+\paragraph{}
+Create a burger plantation near base
+\begin{itemize}
+	\item Explorers wander searching for food
+	\item Harvesters follow the closest Explorer or wander
+	\item When Explorers find food, they come back to base and notify each harvester and explorer nearby
+	\item Harvesters go to food if indicated, or if they are still wandering after some time, they come back to base
+	\item When Harvesters arrive to base, they plant the seed or transfer to the base, depending on a probability
+\end{itemize}
+
+\paragraph{}
+Trouver la base ennemie et la zerg rush
+\begin{itemize}
+	\item One explorer out of N tries to find the enemy base and takes the information back home
+	\item Each other explorer goes to the enemy base and collides any enemy unit on its path
+\end{itemize}
+
 \begin{table}[ht]
 	Memory assignments for all robots\\
 	\begin{tabular}{|c|l|}
@@ -16,21 +35,6 @@
 		\hline
 		Mem 0 a & Current State\\
 		Mem 0 b & Time since last state change\\
-		\hline
-		Mem 1 a & Base x\\
-		Mem 1 b & Base y\\
-		\hline
-		Mem 2 a & Robot type dependant\\
-		Mem 2 b & Robot type dependant\\
-		\hline
-		Mem 3 a & Robot type dependant\\
-		Mem 3 b & Robot type dependant\\
-		\hline
-		Mem 4 a & Robot type dependant\\
-		Mem 4 b & Robot type dependant\\
-		\hline
-		Mem 5 a & Robot type dependant\\
-		Mem 5 b & Robot type dependant\\
 		\hline
 	\end{tabular}
 \end{table}
@@ -43,17 +47,8 @@
 		\hline
 		Memory & Description\\
 		\hline
-		Mem 2 a & Last closest ennemy RocketLauncher position x\\
-		Mem 2 b & Last closest ennemy RocketLauncher position y\\
-		\hline
-		Mem 3 a & Last closest friend RocketLauncher position x\\
-		Mem 3 b & Last closest friend RocketLauncher position y\\
-		\hline
-		Mem 4 a & Last resource or Explorer knowing resource position x\\
-		Mem 4 b & Last resource or Explorer knowing resource position y\\
-		\hline
-		Mem 5 a & Knows resource or Explorer position\\
-		Mem 5 b & Resource type\\
+		Mem 1 a & Food x or Enemy base x\\
+		Mem 1 b & Food y or Enemy base y\\
 		\hline
 	\end{tabular}
 \end{table}
@@ -66,15 +61,79 @@
 		\hline
 		0 & Wandering : goes in random directions, while trying to dodge objects\\
 		\hline
-		1 & Antenna : relays information to nearby wandering harvesters\\
+		1 & Goes back to base to transmit food info\\
 		\hline
-		2 & Fleeing : try to go away from nearby closest ennemy while\\
-		& trying to reach closest friend RocketLauncher or Base\\
+		2 & Searching enemy base\\
+		\hline
+		3 & Goes back to base to transmit enemy base location\\
+		\hline
+		4 & Suicide mode\\
+		\hline
+	\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+	State transitions\\
+	\begin{tabular}{|c|c|l|}
+		\hline
+		From & To & Conditions\\
+		\hline
+		0 & 1 & Resource in range\\
+		\hline
+		1 & 2 & Arrived to base\\
+		\hline
+		2 & 3 & Find enemy base and random\\
+		\hline
+		2 & 4 & Find enemy base and random\\
 		\hline
 	\end{tabular}
 \end{table}
 
 \section{Harvesters behaviour}
+
+\begin{table}[ht]
+	Memory assignments for harvesters\\
+	\begin{tabular}{|c|l|}
+		\hline
+		Memory & Description\\
+		\hline
+		Mem 1 a & Food x\\
+		Mem 1 b & Food y\\
+		\hline
+	\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+	State array\\
+	\begin{tabular}{|c|l|}
+		\hline
+		State & Description \\
+		\hline
+		0 & Wandering : goes in random directions, while trying to dodge objects\\
+		\hline
+		1 & Collecting : goes to a resource location known or indicated by an Explorer\\
+		\hline
+		2 & Retrieving : brings a resource bask to the base\\
+		\hline
+		3 & Farming : Plant seeds and harvest seeds around base\\
+		\hline
+	\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+	State transitions\\
+	\begin{tabular}{|c|c|l|}
+		\hline
+		From & To & Conditions\\
+		\hline
+		0 & 1 & Resource or Explorer knowing resource in range\\
+		\hline
+		1 & 2 & Carries resource\\
+		\hline
+		2 & 3 & Near base\\
+		\hline
+	\end{tabular}
+\end{table}
 
 \section{Bases behaviour}
 

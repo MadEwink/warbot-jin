@@ -137,7 +137,8 @@ to goRedHarvester
   ][ ifelse (item 0 mem0 = 1) [
       ;; collecting resources
     ][ ifelse (item 0 mem0 = 2) [
-        ;; bring back the resource to life
+        ;; bring back the resource to the base
+        red-team-go-back-to-base
       ][ ifelse (item 0 mem0 = 3) [
           ;; farming
         ]

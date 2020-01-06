@@ -16,7 +16,7 @@ globals [
 to tom-init-parameters
   set tom-init-nbr-explorers 1
   set tom-init-nbr-harvesters 1
-  set tom-proportion-kamikaze 100
+  set tom-proportion-kamikaze 70
 end
 
 to red-team-ask-for-energy [ b n ]
@@ -129,13 +129,51 @@ to tom-explorer-get-food-info [ robot ]
   ]
 end
 
+to tom-switch-to-kamikaze-or-return-base
+  let random-number random 100
+  ifelse (random-number < tom-proportion-kamikaze)
+  [
+    set mem0 list 4 0
+  ][
+    set mem0 list 3 0
+  ]
+end
+
+to tom-explorer-get-enemy-base-info [ robot ]
+  if ( [breed] of robot = Explorers )
+  [
+    if ( item 0 [mem0] of robot = 3 OR item 0 [mem0] of robot = 4 )
+    [
+      tom-switch-to-kamikaze-or-return-base
+      set mem1 [mem1] of robot
+    ]
+  ]
+end
+
 to tom-move-random-direction
-  set heading random 360
+  ;;set heading random 360
   while [free-ahead? speed != NOBODY]
   [
     set heading random 360
   ]
   forward-move speed
+end
+
+;; returns true if it keeps moving towards the base, false if it is too close
+to-report tom-move-back-to-base
+  let closest-base min-one-of my-bases [distance myself]
+  set heading towards closest-base
+  if (distance closest-base > detection-range / 2)
+  [
+    ifelse (free-ahead? speed != NOBODY)
+    [
+      tom-move-random-direction
+    ][
+      forward-move speed
+    ]
+    report TRUE
+  ]
+  report FALSE
 end
 
 to goRedExplorer
@@ -168,9 +206,33 @@ to goRedExplorer
       robot -> tom-explorer-get-food-info robot
     ]
   ]
-  if (item 0 mem0 = 1)
+  ;;return to base
+  if (item 0 mem0 = 1 OR item 0 mem0 = 3)
   [
+    if (NOT tom-move-back-to-base)
+    [
+      set mem0 list 2 0
+    ]
   ]
+  ;;search enemy base
+  if (item 0 mem0 = 2)
+  [
+    tom-move-random-direction
+    let enemy-bases perceive-base ennemy
+    if (any? enemy-bases)
+    [
+      let closest-enemy-base min-one-of enemy-bases [distance myself]
+      let ceb-x [xcor] of closest-enemy-base
+      let ceb-y [ycor] of closest-enemy-base
+      set mem1 list ceb-x ceb-y
+      tom-switch-to-kamikaze-or-return-base
+    ]
+    foreach friend-robots
+    [
+      robot -> tom-explorer-get-enemy-base-info robot
+    ]
+  ]
+  ;;
   
 end
 
@@ -187,7 +249,7 @@ to goRedHarvester
 
   ifelse (item 0 mem0 = 0) [
     ;; use the random dir of MadEwink
-    tom-move-random-direction speed
+    tom-move-random-direction
     ;; TODO switch to other state
   ][ ifelse (item 0 mem0 = 1) [
       ;; collecting resources

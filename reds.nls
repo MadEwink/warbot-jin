@@ -126,6 +126,24 @@ to goRedRocketLauncher
 end
 
 to goRedHarvester
+  ;; switch case on the state of self
+  ;; 0 Wandering : goes in random directions, while trying to dodge objects
+  ;; 1 Collecting : goes to a resource location known or indicated by an Explorer
+  ;; 2 Retrieving : brings a resource bask to the base
+  ;; 3 Farming : Plant seeds and harvest seeds around base
+
+  ifelse (item 0 mem0 == 0) [
+    ;; use the random dir of MadEwink
+  ][ ifelse (item 0 mem0 == 1) [
+      ;; collecting resources
+    ][ ifelse (item 0 mem0 == 2) [
+        ;; bring back the resource to life
+      ][ ifelse (item 0 mem0 == 3) [
+          ;; farming
+        ]
+    ]
+  ]
+  
 end
 
 to goRedBase

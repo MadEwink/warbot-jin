@@ -5,6 +5,14 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Parameters below
+
+globals [
+  tom-init-nbr-explorers 1
+  tom-init-nbr-harvesters 1
+  tom-proportion-kamikaze 100
+]
+
 to red-team-ask-for-energy [ b n ]
   ask b [ if (energy > 6000) [ give-energy myself n ]]
 end
@@ -104,45 +112,32 @@ to red-team-shoot
 end
 
 to goRedExplorer
-  red-team-go-back-to-base
-  red-team-go-and-eat
-
-  ifelse (not red-team-no-target?) [
-    red-team-call-rocket-launcher mem0 mem1 mem2
-    red-team-call-explorer mem0 mem1 mem2
-  ]
-  [ let h one-of perceive-robots ennemy
-    if ( h != nobody ) [ red-team-call-rocket-launcher [xcor] of h [ycor] of h [breed] of h]
-  ]
+  
 end
 
 to goRedRocketLauncher
-  red-team-go-back-to-base
-  red-team-select-target
-  red-team-shoot
-  red-team-go-and-eat
-
-  if ((energy > 3000) and (nb-missiles < 5)) [ new-missile 1 ]
+  
 end
 
 to goRedHarvester
-  ;; rentre à la base si certaines conditions sont vérifiées
-  red-team-go-back-to-base
-  ;; cherche à manger
-  red-team-harvesters-go-and-eat
 end
 
 to goRedBase
-  set label energy
-  if (energy > 12000) [ new-RocketLauncher self ]
-  let t one-of perceive-specific-robots ennemy rocketlaunchers
-  if (t != nobody) [
-    launch-rocket towards t
+  if (item 0 mem1 > 0)
+  [
+    new-Harvester self
+    replace-item 0 mem1 [item 0 mem1 - 1]
+  ]
+  if (item 1 mem1 > 0)
+  [
+    new-Explorer self
+    replace-item 1 mem1 [item 1 mem1 - 1]
   ]
 end
 
 ;; procedure pour initialiser les explorers rouges
 to initRedExplorer
+  set mem0 list 0 0
 end
 
 ;; procedure pour initialiser les rocket-launchers rouges
@@ -155,4 +150,7 @@ end
 
 ;; procedure pour initialiser les bases rouges
 to initRedBase
+  new-Harvester self
+  new-Explorer self
+  set mem1 list [tom-init-nbr-harvesters - 1] [tom-init-nbr-explorers - 1]
 end

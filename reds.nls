@@ -8,10 +8,16 @@
 ;; Parameters below
 
 globals [
-  tom-init-nbr-explorers 1
-  tom-init-nbr-harvesters 1
-  tom-proportion-kamikaze 100
+  tom-init-nbr-explorers
+  tom-init-nbr-harvesters
+  tom-proportion-kamikaze
 ]
+
+to tom-init-parameters
+  set tom-init-nbr-explorers 1
+  set tom-init-nbr-harvesters 1
+  set tom-proportion-kamikaze 100
+end
 
 to red-team-ask-for-energy [ b n ]
   ask b [ if (energy > 6000) [ give-energy myself n ]]
@@ -127,13 +133,17 @@ to goRedBase
   ifelse (item 0 mem1 > 0)
   [
     new-Harvester self
-    replace-item 0 mem1 [item 0 mem1 - 1]
+    ;; nik
+    let temp item 0 mem1 - 1
+    set mem1 replace-item 0 mem1 temp
   ]
   [
-  if (item 1 mem1 > 0)
+    if (item 1 mem1 > 0)
     [
+      ;; replace-item 1 mem1 42
+      let temp item 1 mem1 - 1
+      set mem1 replace-item 1 mem1 temp
       new-Explorer self
-      replace-item 1 mem1 [item 1 mem1 - 1]
     ]
   ]
   
@@ -154,6 +164,8 @@ end
 
 ;; procedure pour initialiser les bases rouges
 to initRedBase
+  tom-init-parameters
+  
   new-Harvester self
   set mem1 list [tom-init-nbr-harvesters - 1] [tom-init-nbr-explorers]
 end

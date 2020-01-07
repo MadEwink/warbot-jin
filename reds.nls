@@ -17,7 +17,7 @@ globals [
 to tom-init-parameters
   set tom-init-nbr-explorers 10
   set tom-init-nbr-harvesters 1
-  set tom-proportion-kamikaze 95
+  set tom-proportion-kamikaze 100
   set tom-harvester-job-switch 50
 end
 
@@ -149,6 +149,12 @@ to tom-explorer-get-enemy-base-info [ robot ]
       tom-switch-to-kamikaze-or-return-base
       set mem1 [mem1] of robot
       set mem2 0
+      ;; if base knows indicated enemy base, force kamikaze
+      if (item 1 [mem3] of robot = 1)
+      [
+        set mem3 replace-item 1 mem3 1
+        set mem0 list 4 0
+      ]
     ]
     ;; if enemy indicates a destroyed base and it is current base, propagate information
     if ([mem2] of robot = 1 AND item 0 mem1 = item 0 [mem1] of robot AND item 1 mem1 = item 1 [mem1] of robot)
@@ -222,6 +228,19 @@ to goRedExplorer
   [
     if (NOT tom-move-back-to-base)
     [
+      let closest-base min-one-of my-bases [distance myself]
+      ifelse (item 0 mem0 = 1)
+      [
+        ask closest-base [
+          set mem2 [mem1] of myself
+        ]
+        set mem3 replace-item 0 mem3 1
+      ][
+        ask closest-base [
+          set mem3 [mem1] of myself
+        ]
+        set mem3 replace-item 1 mem3 1
+      ]
       set mem0 list 2 0
     ]
   ]
@@ -272,11 +291,18 @@ to goRedHarvester
   ;; 1 Collecting : goes to a resource location known or indicated by an Explorer
   ;; 2 Retrieving : brings a resource bask to the base
   ;; 3 Farming : Plant seeds and harvest seeds around base
+  
+  ;;find nearby friend robots
+  let friend-robots [self] of perceive-robots color
 
   ifelse (item 0 mem0 = 0) [
     ;; use the random dir of MadEwink
     tom-move-random-direction
-    ;; TODO switch to other state
+    ;;find explorer or harvester knowing food location
+    foreach friend-robots
+    [
+      robot -> tom-explorer-get-food-info robot
+    ]
     ifelse (item 0 mem1 != 0) [
       set mem0 replace-item 0 mem0 1
     ][
@@ -292,6 +318,10 @@ to goRedHarvester
     ifelse (item 0 mem0 = 1) [
       ;; collecting resources
       
+      foreach friend-robots
+      [
+        robot -> tom-explorer-get-food-info robot
+      ]
       let b min-one-of perceive-food [ distance self ]
       ;; if resource in range :
       ifelse (b != nobody and distance b < 2)[
@@ -357,7 +387,6 @@ to goRedBase
   ifelse (item 0 mem1 > 0)
   [
     new-Harvester self
-    ;; nik
     let temp item 0 mem1 - 1
     set mem1 replace-item 0 mem1 temp
   ]
@@ -374,14 +403,12 @@ to goRedBase
   [
     set mem0 0
   ]
-  if (mem0 = 0 AND energy > 15500)
+  ;; add explorer to queue
+  if (mem0 = 0 AND energy > 3500)
   [
-    set mem1 replace-item 1 mem1 10
+    set mem1 replace-item 1 mem1 1
     set mem0 1
   ]
-  
-  ;; give energy to robots around if they need it
-  
 end
 
 ;; procedure pour initialiser les explorers rouges
@@ -390,6 +417,21 @@ to initRedExplorer
   set mem1 list 0 0
   ;; if the enemy base indicated in mem1 is destroyed
   set mem2 0
+  ;; if the base knows food position and enemy base position
+  set mem3 list 0 0
+  let closest-base min-one-of my-bases [ distance myself ]
+  ;; if the base already knows a food position, search enemy base
+  if (item 0 [mem2] of closest-base != 0 or item 1 [mem2] of closest-base != 0)
+  [
+    set mem3 replace-item 0 mem3 1
+    set mem0 list 2 0
+  ]
+  ;; if the base already knows an enemy base, switch to appropriate state
+  if (item 0 [mem3] of closest-base != 0 or item 1 [mem3] of closest-base != 0)
+  [
+    set mem3 replace-item 1 mem3 1
+    tom-switch-to-kamikaze-or-return-base
+  ]
 end
 
 ;; procedure pour initialiser les rocket-launchers rouges
@@ -410,4 +452,8 @@ to initRedBase
   let temp1 tom-init-nbr-harvesters - 1
   set mem1 list temp1 tom-init-nbr-explorers
   set mem0 1
+  ;; food position
+  set mem2 list 0 0
+  ;; enemy base position
+  set mem3 list 0 0
 end

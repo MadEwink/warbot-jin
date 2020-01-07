@@ -11,12 +11,14 @@ globals [
   tom-init-nbr-explorers
   tom-init-nbr-harvesters
   tom-proportion-kamikaze
+  tom-harvester-job-switch  ;; the higher this is, the lower farmers we'll have
 ]
 
 to tom-init-parameters
   set tom-init-nbr-explorers 1
   set tom-init-nbr-harvesters 1
   set tom-proportion-kamikaze 70
+  set tom-harvester-job-switch 50
 end
 
 to red-team-ask-for-energy [ b n ]
@@ -255,7 +257,8 @@ to goRedHarvester
     ;; use the random dir of MadEwink
     tom-move-random-direction
     ;; TODO switch to other state
-  ][ ifelse (item 0 mem0 = 1) [
+  ][
+    ifelse (item 0 mem0 = 1) [
       ;; collecting resources
       
       let b min-one-of perceive-food [ distance self ]
@@ -265,19 +268,36 @@ to goRedHarvester
         ;; switch to state 2, to return to base
         set mem0 replace-item 0 mem1 2
       ][
-        ;; else :
         let tempx item 0 mem1
         let tempy item 1 mem1
         facexy tempx tempy
-        ;;set heading towards angle-to-base
+        ;;set heading towards angle-to-food
         ;; TODO may collide with a wall
         forward-move speed
       ]
-    ][ ifelse (item 0 mem0 = 2) [
+      ;; if close, then give food and switch state
+        let c min-one-of my-bases [ distance myself ]
+        if (c != nobody) [
+          if (distance c <= 2) [ 
+            if (carrying-food? > 1000) [ give-food c carrying-food? ]
+            if (energy < 500) [ red-team-ask-for-energy c 500 ]
+          ]
+        ]
+        let rdtemp random 100
+        ifelse (rdtemp < tom-harvester-job-switch) [
+          set mem0 replace-item 0 mem1 0
+        ][
+          set mem0 replace-item 0 mem1 3
+        ]
+      ][ ifelse (item 0 mem0 = 2) [
         ;; bring back the resource to the base : they know where to find the food !
-        red-team-go-back-to-base
-      ][ if (item 0 mem0 = 3) [
-          ;; farming
+        let temp tom-move-back-to-base
+        ][ if (item 0 mem0 = 3) [
+          ;; farming :
+          ;; go near base, on an empty plot
+          ;; then plant seed
+          ;; if burger is ready, collect it
+          ;; give food if we have any
         ]
       ]
     ]
@@ -303,6 +323,8 @@ to goRedBase
       new-Explorer self
     ]
   ]
+  
+  ;; give energy to robots around if they need it
   
 end
 

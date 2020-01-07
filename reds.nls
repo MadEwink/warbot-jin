@@ -12,13 +12,15 @@ globals [
   tom-init-nbr-harvesters
   tom-proportion-kamikaze
   tom-harvester-job-switch  ;; the higher this is, the lower farmers we'll have
+  tom-farming-distance
 ]
 
 to tom-init-parameters
-  set tom-init-nbr-explorers 10
-  set tom-init-nbr-harvesters 1
-  set tom-proportion-kamikaze 100
+  set tom-init-nbr-explorers   10
+  set tom-init-nbr-harvesters  1
+  set tom-proportion-kamikaze  100
   set tom-harvester-job-switch 50
+  set tom-farming-distance     10
 end
 
 to red-team-ask-for-energy [ b n ]
@@ -226,6 +228,15 @@ to tom-harvester-take-food
   ]
 end
 
+to tom-give-food-to-base
+  let c min-one-of my-bases [ distance myself ]
+  if (c != nobody and distance c <= 2) [
+    if (carrying-food? > 100)[
+      give-food c (carrying-food? - 100)
+    ]
+  ]
+end
+
 to goRedExplorer
   ;;find nearby friend robots
   let friend-robots [self] of perceive-robots color
@@ -330,10 +341,10 @@ to goRedHarvester
   
   ifelse (mem2 = 1)[
     ;; try to find food and move towards it
-    let b min-one-of perceive-food [ distance self ]
+    let f min-one-of perceive-food [ distance self ]
     ;; if resource in range :
-    if (b != nobody)[
-      set mem1 list [xcor] of b [ycor] of b
+    if (f != nobody)[
+      set mem1 list [xcor] of f [ycor] of f
     ]
     tom-move-to-food
     tom-harvester-take-food
@@ -369,7 +380,7 @@ to goRedHarvester
         if (c != nobody) [
           if (distance c <= 2) [
             ;;if (carrying-food? > 1000) [ give-food c carrying-food? ]
-            give-food c carrying-food?
+            tom-give-food-to-base
             if (energy < 500) [ red-team-ask-for-energy c 500 ]
             let rdtemp random 100
             
@@ -390,8 +401,7 @@ to goRedHarvester
           let temp tom-move-back-to-base
           let c min-one-of my-bases [ distance myself ]
           if (c != nobody and distance c <= 2) [
-            ;;if (carrying-food? > 1000) [ give-food c carrying-food? ]
-            give-food c carrying-food?
+            tom-give-food-to-base
             if (energy < 500) [ red-team-ask-for-energy c 500 ]
             let rdtemp random 100
             ifelse (rdtemp < tom-harvester-job-switch) [
@@ -403,7 +413,14 @@ to goRedHarvester
           ][ if (item 0 mem0 = 3) [
             ;; farming :
             ;; go near base, on an empty plot
+            ;; if distance to min base < tom-farming-distance and TODO : plot empty
+            let b min-one-of my-bases [ distance myself ]
+            ifelse (b != nobody and distance b < tom-farming-distance) [
             ;; then plant seed
+              plant-seeds color max-seeds
+            ][
+              tom-move-random-direction
+            ]
             ;; if burger is ready, collect it
             ;; give food if we have any
             

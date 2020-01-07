@@ -193,6 +193,31 @@ to-report tom-move-back-to-base
   report FALSE
 end
 
+to tom-move-to-food
+  let tempx item 0 mem1
+  let tempy item 1 mem1
+  facexy tempx tempy
+  ;;set heading towards angle-to-food
+  ;; TODO may collide with a wall
+  ifelse (free-ahead? speed != NOBODY)
+    [
+      tom-move-random-direction
+    ][
+      forward-move speed
+  ]
+end
+
+;; will take food and change state if in range
+to tom-harvester-take-food
+  let b min-one-of perceive-food [ distance self ]
+  ;; if resource in range :
+  if (b != nobody and distance b < 2)[
+    take-food b
+    ;; switch to state 2, to return to base
+    set mem0 replace-item 0 mem0 2
+  ]
+end
+
 to goRedExplorer
   ;;find nearby friend robots
   let friend-robots [self] of perceive-robots color
@@ -306,13 +331,7 @@ to goRedHarvester
     ifelse (item 0 mem1 != 0) [
       set mem0 replace-item 0 mem0 1
     ][
-      let b min-one-of perceive-food [ distance self ]
-      ;; if resource in range :
-      if (b != nobody and distance b < 2)[
-        take-food b
-        ;; switch to state 2, to return to base
-        set mem0 replace-item 0 mem0 2
-      ]
+      tom-harvester-take-food
     ]
   ][
     ifelse (item 0 mem0 = 1) [
@@ -322,24 +341,14 @@ to goRedHarvester
       [
         robot -> tom-explorer-get-food-info robot
       ]
-      let b min-one-of perceive-food [ distance self ]
-      ;; if resource in range :
-      ifelse (b != nobody and distance b < 2)[
-        take-food b
-        ;; switch to state 2, to return to base
-        set mem0 replace-item 0 mem1 2
-      ][
-        let tempx item 0 mem1
-        let tempy item 1 mem1
-        facexy tempx tempy
-        ;;set heading towards angle-to-food
-        ;; TODO may collide with a wall
-        forward-move speed
-      ]
+      tom-move-to-food
+      
+      tom-harvester-take-food
+      
       ;; if close, then give food and switch state
-        let c min-one-of my-bases [ distance myself ]
-        if (c != nobody) [
-          if (distance c <= 2) [ 
+      let c min-one-of my-bases [ distance myself ]
+      if (c != nobody) [
+        if (distance c <= 2) [ 
           print "prout"
           ;;if (carrying-food? > 1000) [ give-food c carrying-food? ]
           give-food c carrying-food?
@@ -354,6 +363,9 @@ to goRedHarvester
       ]
       ][ ifelse (item 0 mem0 = 2) [
         ;; bring back the resource to the base : they know where to find the food !
+        
+        tom-harvester-take-food
+        
         let temp tom-move-back-to-base
         let c min-one-of my-bases [ distance myself ]
         if (c != nobody and distance c <= 2) [

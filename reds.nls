@@ -257,8 +257,16 @@ to goRedHarvester
     ;; use the random dir of MadEwink
     tom-move-random-direction
     ;; TODO switch to other state
-    if (item 0 mem1 != 0) [
+    ifelse (item 0 mem1 != 0) [
       set mem0 replace-item 0 mem1 1
+    ][
+      let b min-one-of perceive-food [ distance self ]
+      ;; if resource in range :
+      if (b != nobody)[
+        take-food b
+        ;; switch to state 2, to return to base
+        set mem0 replace-item 0 mem1 2
+      ]
     ]
   ][
     ifelse (item 0 mem0 = 1) [
@@ -282,19 +290,32 @@ to goRedHarvester
         let c min-one-of my-bases [ distance myself ]
         if (c != nobody) [
           if (distance c <= 2) [ 
-            if (carrying-food? > 1000) [ give-food c carrying-food? ]
-            if (energy < 500) [ red-team-ask-for-energy c 500 ]
+          if (carrying-food? > 1000) [ give-food c carrying-food? ]
+          if (energy < 500) [ red-team-ask-for-energy c 500 ]
+          let rdtemp random 100
+          ifelse (rdtemp < tom-harvester-job-switch) [
+            set mem0 replace-item 0 mem1 0
+          ][
+            set mem0 replace-item 0 mem1 3
           ]
         ]
-        let rdtemp random 100
-        ifelse (rdtemp < tom-harvester-job-switch) [
-          set mem0 replace-item 0 mem1 0
-        ][
-          set mem0 replace-item 0 mem1 3
-        ]
+      ]
       ][ ifelse (item 0 mem0 = 2) [
         ;; bring back the resource to the base : they know where to find the food !
         let temp tom-move-back-to-base
+        let c min-one-of my-bases [ distance myself ]
+        if (c != nobody) [
+          if (distance c <= 2) [ 
+            if (carrying-food? > 1000) [ give-food c carrying-food? ]
+            if (energy < 500) [ red-team-ask-for-energy c 500 ]
+            let rdtemp random 100
+            ifelse (rdtemp < tom-harvester-job-switch) [
+              set mem0 replace-item 0 mem1 0
+            ][
+              set mem0 replace-item 0 mem1 3
+            ]
+          ]
+        ]
         ][ if (item 0 mem0 = 3) [
           ;; farming :
           ;; go near base, on an empty plot

@@ -234,8 +234,12 @@ to goRedExplorer
       robot -> tom-explorer-get-enemy-base-info robot
     ]
   ]
-  ;;
-  
+  ;;kamikaze into enemy base
+  if ( item 0 mem0 = 4 )
+  [
+    facexy item 0 mem1 item 1 mem1
+    forward-move speed
+  ]
 end
 
 to goRedRocketLauncher

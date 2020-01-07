@@ -258,14 +258,14 @@ to goRedHarvester
     tom-move-random-direction
     ;; TODO switch to other state
     ifelse (item 0 mem1 != 0) [
-      set mem0 replace-item 0 mem1 1
+      set mem0 replace-item 0 mem0 1
     ][
       let b min-one-of perceive-food [ distance self ]
       ;; if resource in range :
-      if (b != nobody)[
+      if (b != nobody and distance b < 2)[
         take-food b
         ;; switch to state 2, to return to base
-        set mem0 replace-item 0 mem1 2
+        set mem0 replace-item 0 mem0 2
       ]
     ]
   ][
@@ -274,7 +274,7 @@ to goRedHarvester
       
       let b min-one-of perceive-food [ distance self ]
       ;; if resource in range :
-      ifelse (b != nobody)[
+      ifelse (b != nobody and distance b < 2)[
         take-food b
         ;; switch to state 2, to return to base
         set mem0 replace-item 0 mem1 2
@@ -290,13 +290,15 @@ to goRedHarvester
         let c min-one-of my-bases [ distance myself ]
         if (c != nobody) [
           if (distance c <= 2) [ 
-          if (carrying-food? > 1000) [ give-food c carrying-food? ]
+          print "prout"
+          ;;if (carrying-food? > 1000) [ give-food c carrying-food? ]
+          give-food c carrying-food?
           if (energy < 500) [ red-team-ask-for-energy c 500 ]
           let rdtemp random 100
           ifelse (rdtemp < tom-harvester-job-switch) [
-            set mem0 replace-item 0 mem1 0
+            set mem0 replace-item 0 mem0 0
           ][
-            set mem0 replace-item 0 mem1 3
+            set mem0 replace-item 0 mem0 3
           ]
         ]
       ]
@@ -304,24 +306,25 @@ to goRedHarvester
         ;; bring back the resource to the base : they know where to find the food !
         let temp tom-move-back-to-base
         let c min-one-of my-bases [ distance myself ]
-        if (c != nobody) [
-          if (distance c <= 2) [ 
-            if (carrying-food? > 1000) [ give-food c carrying-food? ]
+        if (c != nobody and distance c <= 2) [
+          print "prout"
+            ;;if (carrying-food? > 1000) [ give-food c carrying-food? ]
+          give-food c carrying-food?
             if (energy < 500) [ red-team-ask-for-energy c 500 ]
             let rdtemp random 100
             ifelse (rdtemp < tom-harvester-job-switch) [
-              set mem0 replace-item 0 mem1 0
+              set mem0 replace-item 0 mem0 0
             ][
-              set mem0 replace-item 0 mem1 3
+              set mem0 replace-item 0 mem0 3
             ]
           ]
-        ]
         ][ if (item 0 mem0 = 3) [
           ;; farming :
           ;; go near base, on an empty plot
           ;; then plant seed
           ;; if burger is ready, collect it
           ;; give food if we have any
+          set mem0 replace-item 0 mem0 0
         ]
       ]
     ]

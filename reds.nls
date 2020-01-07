@@ -194,9 +194,15 @@ to-report tom-move-back-to-base
 end
 
 to tom-move-to-food
-  let tempx item 0 mem1
-  let tempy item 1 mem1
-  facexy tempx tempy
+  let foodx item 0 mem1
+  let foody item 1 mem1
+  
+  if (abs(foodx - xcor) < 1 and abs(foody - ycor) < 1) [
+    set mem1 list 0 0
+    set mem0 replace-item 0 mem0 0
+  ]
+  
+  facexy foodx foody
   ;;set heading towards angle-to-food
   ;; TODO may collide with a wall
   ifelse (free-ahead? speed != NOBODY)
@@ -361,8 +367,7 @@ to goRedHarvester
         ;; if close, then give food and switch state
         let c min-one-of my-bases [ distance myself ]
         if (c != nobody) [
-          if (distance c <= 2) [ 
-            print "prout"
+          if (distance c <= 2) [
             ;;if (carrying-food? > 1000) [ give-food c carrying-food? ]
             give-food c carrying-food?
             if (energy < 500) [ red-team-ask-for-energy c 500 ]
@@ -385,7 +390,6 @@ to goRedHarvester
           let temp tom-move-back-to-base
           let c min-one-of my-bases [ distance myself ]
           if (c != nobody and distance c <= 2) [
-            print "prout"
             ;;if (carrying-food? > 1000) [ give-food c carrying-food? ]
             give-food c carrying-food?
             if (energy < 500) [ red-team-ask-for-energy c 500 ]

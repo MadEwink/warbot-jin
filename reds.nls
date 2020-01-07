@@ -253,6 +253,9 @@ to goRedHarvester
     ;; use the random dir of MadEwink
     tom-move-random-direction
     ;; TODO switch to other state
+    if (item 0 mem1 != 0) [
+      set mem0 replace-item 0 mem1 1
+    ]
   ][
     ifelse (item 0 mem0 = 1) [
       ;; collecting resources

@@ -8,23 +8,32 @@
 
 \begin{document}
 
-\section{Strategy}
+\section{Stratégie}
 
 \paragraph{}
-Create a burger plantation near base
+
+Notre stratégie générale est centrée autour d'une ruée sur les bases adverses par des Explorers.
+Il faut donc trouver les bases adverses le plus vite possible.
+Cependant, nous avons aussi besoin d'une agriculture, de manière à continuer de créer des Explorers si la vague initiale est insuffisante.
+Il y a donc deux parties à notre stratégie : la gestion des explorers, et celle des harvesters.
+
+\paragraph{}
+L'une des parties consiste à créer une ferme autour des bases.
 \begin{itemize}
-	\item Explorers wander searching for food
-	\item Harvesters follow the closest Explorer or wander
-	\item When Explorers find food, they come back to base and notify each harvester and explorer nearby
-	\item Harvesters go to food if indicated, or if they are still wandering after some time, they come back to base
-	\item When Harvesters arrive to base, they plant the seed or transfer to the base, depending on a probability
+	\item Les Explorers marchent aléatoirement à la recherche de burgers
+        \item Les Harvesters suivent l'explorer le plus proche, ou marchent aléatoirement
+        \item Quand les Harvesters trouvent de la nourriture, ils la collectent et rentrent à la base, en prévenant les explorers et harvesters en chemin
+        \item Quand un Explorer trouve de la nourriture, il rentre à la base, et prévient les explorers et harvesters en chemin
+        \item Les Harvesters vont à la source de nourriture s'ils l'a connaissent, et rentrent à la base au bout d'un certain temps s'ils ont errés pendant trop longtemps
+        \item Quand les Harvesters arrivent à la base, ils transfèrent une partie de leurs ressources, et plantent le reste
 \end{itemize}
 
 \paragraph{}
-Trouver la base ennemie et la zerg rush
+La partie offensive de notre stratégie consiste à trouver la base ennemie et se ruer dessus avec des explorer.
 \begin{itemize}
-	\item One explorer out of N tries to find the enemy base and takes the information back home
-	\item Each other explorer goes to the enemy base and collides any enemy unit on its path
+	\item Des explorers essaient de trouver une base ennemie. Une fois que ceci est fait, une partie rentre à la base, et l'autre partie attaque. La répartition est déterminée aléatoirement.
+        \item Les explorers rentrant informent les autres explorers croisés en chemin, qui attaquent alors la base ennemie.
+        \item Les explorers qui attaquent foncent tout droit, sans se préoccuper d'éventuels obstacles en chemin.
 \end{itemize}
 
 \begin{table}[ht]

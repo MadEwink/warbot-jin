@@ -41,7 +41,7 @@ La partie offensive de notre stratégie consiste à trouver la base ennemie et s
 Les robots sont gérés comme des machines à état.
 La mémoire est gérée différemment selon le type du robot, mais l'emplacement 0 est le même pour les deux, et sert à stocker l'état du robot.
 
-\begin{table}[ht]
+\begin{table}[!htb]
 	Memory assignments for all robots\\
 	\begin{tabular}{|c|l|}
 		\hline
@@ -57,7 +57,7 @@ La mémoire est gérée différemment selon le type du robot, mais l'emplacement
 
 \subsection{Gestion de la mémoire}
 
-\begin{table}[ht]
+\begin{table}[!htb]
 	Memory assignments for explorers\\
 	\begin{tabular}{|c|l|}
 		\hline
@@ -71,7 +71,7 @@ La mémoire est gérée différemment selon le type du robot, mais l'emplacement
 
 \subsection{Gestion des états}
 
-\begin{table}[ht]
+\begin{table}[!htb]
 	State array\\
 	\begin{tabular}{|c|l|}
 		\hline
@@ -90,7 +90,7 @@ La mémoire est gérée différemment selon le type du robot, mais l'emplacement
 	\end{tabular}
 \end{table}
 
-\begin{table}[ht]
+\begin{table}[!htb]
 	State transitions\\
 	\begin{tabular}{|c|c|l|}
 		\hline
@@ -115,7 +115,7 @@ La mémoire est gérée différemment selon le type du robot, mais l'emplacement
 La principale information que doivent stocker les Harvester est la position de source de nourritures.
 \newline
 
-\begin{table}[ht]
+\begin{table}[!htb]
 	Memory assignments for harvesters\\
 	\begin{tabular}{|c|l|}
 		\hline
@@ -133,7 +133,7 @@ La principale information que doivent stocker les Harvester est la position de s
 
 Nous avons besoin de quatre états : un pour errer aléatoirement, un autre pour récupérer de la nourriture précise, un pour la ramener à la base, et un dernier pour gérer les fermes.
 
-\begin{table}[ht]
+\begin{table}[!htb]
 	State array\\
 	\begin{tabular}{|c|l|}
 		\hline
@@ -154,7 +154,7 @@ Au départ, tous les Harvesters partent explorer.
 Cependant, quand ils rentrent à la base déposer des ressources, il y a une probabilité, gérée par un paramètre, que le harvester se mette à gérer les fermes autour de la base.
 \newline
 
-\begin{table}[ht]
+\begin{table}[!htb]
 	Transitions d'état pour les Harvesters\\
 	\begin{tabular}{|c|c|l|}
 		\hline
@@ -174,7 +174,7 @@ Cependant, quand ils rentrent à la base déposer des ressources, il y a une pro
 \subsection{Gestion de la mémoire}
 
 Les bases doivent retenir le nombre d'unités encore à produire.
-\begin{table}[ht]
+\begin{table}[!htb]
 	Memory assignments for bases\\
 	\begin{tabular}{|c|l|}
 		\hline

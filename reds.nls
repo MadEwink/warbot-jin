@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; le code de l'equipe rouge basique
-;; préfixe : red-team
+;; le code de l'equipe Toni Ombre Mad
+;; préfixe : tom
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -12,6 +12,7 @@ globals [
   tom-init-nbr-harvesters
   tom-proportion-kamikaze
   tom-harvester-job-switch  ;; the higher this is, the lower farmers we'll have
+  tom-farming-distance
 ]
 
 to tom-init-parameters
@@ -19,6 +20,7 @@ to tom-init-parameters
   set tom-init-nbr-harvesters 1
   set tom-proportion-kamikaze 80
   set tom-harvester-job-switch 50
+  set tom-farming-distance     10
 end
 
 to red-team-ask-for-energy [ b n ]
@@ -179,6 +181,48 @@ to tom-kamikaze-move
   ]
 end
 
+to tom-move-to-food
+  let foodx item 0 mem1
+  let foody item 1 mem1
+  
+  if (abs(foodx - xcor) < 1 and abs(foody - ycor) < 1) [
+    set mem1 list 0 0
+    set mem0 replace-item 0 mem0 0
+  ]
+  
+  facexy foodx foody
+  ;;set heading towards angle-to-food
+  ;; TODO may collide with a wall
+  ifelse (free-ahead? speed != NOBODY)
+    [
+      tom-move-random-direction
+    ][
+      forward-move speed
+  ]
+end
+
+;; will take food and change state if in range
+to tom-harvester-take-food
+  set mem2 0
+  let b min-one-of perceive-food [ distance self ]
+  ;; if resource in range :
+  if (b != nobody and distance b < 2)[
+    take-food b
+    ;; switch to state 2, to return to base
+    set mem0 replace-item 0 mem0 2
+    set mem2 1
+  ]
+end
+
+to tom-give-food-to-base
+  let c min-one-of my-bases [ distance myself ]
+  if (c != nobody and distance c <= 2) [
+    if (carrying-food? > 100)[
+      give-food c (carrying-food? - 100)
+    ]
+  ]
+end
+
 to goRedExplorer
   ;;find nearby friend robots
   let friend-robots perceive-robots color
@@ -317,64 +361,62 @@ to goRedHarvester
   ;; 2 Retrieving : brings a resource bask to the base
   ;; 3 Farming : Plant seeds and harvest seeds around base
   
-  ;;find nearby friend robots
-  let friend-robots perceive-robots color
-
-  ifelse (item 0 mem0 = 0) [
-    ;; use the random dir of MadEwink
-    tom-move-random-direction
-    ifelse (item 0 mem1 != 0) [
-      set mem0 replace-item 0 mem0 1
-    ][
-      let b min-one-of perceive-food [ distance self ]
-      ;; if resource in range :
-      if (b != nobody and distance b < 2)[
-        take-food b
-        ;; switch to state 2, to return to base
-        set mem0 replace-item 0 mem0 2
-      ]
+  let friend-robots [self] of perceive-robots color
+  
+  ifelse (mem2 = 1)[
+    ;; try to find food and move towards it
+    let f min-one-of perceive-food [ distance self ]
+    ;; if resource in range :
+    if (f != nobody)[
+      set mem1 list [xcor] of f [ycor] of f
     ]
-  ][
-    ifelse (item 0 mem0 = 1) [
-      ;; collecting resources
-      let b min-one-of perceive-food [ distance self ]
-      ;; if resource in range :
-      ifelse (b != nobody and distance b < 2)[
-        take-food b
-        ;; switch to state 2, to return to base
-        set mem0 replace-item 0 mem1 2
+    tom-move-to-food
+    tom-harvester-take-food
+  ]
+  [
+    ifelse (item 0 mem0 = 0) [
+      tom-harvester-take-food
+      ;; use the random dir of MadEwink
+      tom-move-random-direction
+      ifelse (item 0 mem1 != 0) [
+        set mem0 replace-item 0 mem0 1
       ][
-        let tempx item 0 mem1
-        let tempy item 1 mem1
-        facexy tempx tempy
-        ;;set heading towards angle-to-food
-        ;; TODO may collide with a wall
-        forward-move speed
       ]
-      ;; if close, then give food and switch state
+    ][
+      ifelse (item 0 mem0 = 1) [
+        ;; collecting resources
+        
+        tom-move-to-food
+        
+        tom-harvester-take-food
+        
+        ;; if close, then give food and switch state
         let c min-one-of my-bases [ distance myself ]
         if (c != nobody) [
-          if (distance c <= 2) [ 
-          print "prout"
-          ;;if (carrying-food? > 1000) [ give-food c carrying-food? ]
-          give-food c carrying-food?
-          if (energy < 500) [ red-team-ask-for-energy c 500 ]
-          let rdtemp random 100
-          ifelse (rdtemp < tom-harvester-job-switch) [
-            set mem0 replace-item 0 mem0 0
-          ][
-            set mem0 replace-item 0 mem0 3
+          if (distance c <= 2) [
+            ;;if (carrying-food? > 1000) [ give-food c carrying-food? ]
+            tom-give-food-to-base
+            if (energy < 500) [ red-team-ask-for-energy c 500 ]
+            let rdtemp random 100
+            
+            ;; if we carry more than xxx, and we haven't found food in the previous turn
+            if (carrying-food? > 1000) []
+            ifelse (rdtemp < tom-harvester-job-switch) [
+              set mem0 replace-item 0 mem0 0
+            ][
+              set mem0 replace-item 0 mem0 3
+            ]
           ]
         ]
-      ]
-      ][ ifelse (item 0 mem0 = 2) [
-        ;; bring back the resource to the base : they know where to find the food !
-        let temp tom-move-back-to-base
-        let c min-one-of my-bases [ distance myself ]
-        if (c != nobody and distance c <= 2) [
-          print "prout"
-            ;;if (carrying-food? > 1000) [ give-food c carrying-food? ]
-          give-food c carrying-food?
+        ][ ifelse (item 0 mem0 = 2) [
+          ;; bring back the resource to the base : they know where to find the food !
+          
+          tom-harvester-take-food
+          
+          let temp tom-move-back-to-base
+          let c min-one-of my-bases [ distance myself ]
+          if (c != nobody and distance c <= 2) [
+            tom-give-food-to-base
             if (energy < 500) [ red-team-ask-for-energy c 500 ]
             let rdtemp random 100
             ifelse (rdtemp < tom-harvester-job-switch) [
@@ -383,13 +425,23 @@ to goRedHarvester
               set mem0 replace-item 0 mem0 3
             ]
           ]
-        ][ if (item 0 mem0 = 3) [
-          ;; farming :
-          ;; go near base, on an empty plot
-          ;; then plant seed
-          ;; if burger is ready, collect it
-          ;; give food if we have any
-          set mem0 replace-item 0 mem0 0
+          ][ if (item 0 mem0 = 3) [
+            ;; farming :
+            ;; go near base, on an empty plot
+            ;; if distance to min base < tom-farming-distance and TODO : plot empty
+            let b min-one-of my-bases [ distance myself ]
+            ifelse (b != nobody and distance b < tom-farming-distance) [
+            ;; then plant seed
+              plant-seeds color max-seeds
+            ][
+              tom-move-random-direction
+            ]
+            ;; if burger is ready, collect it
+            ;; give food if we have any
+            
+            tom-harvester-take-food
+            set mem0 replace-item 0 mem0 0
+          ]
         ]
       ]
     ]
@@ -457,6 +509,7 @@ end
 to initRedHarvester
   set mem0 list 0 0
   set mem1 list 0 0
+  set mem2 0
 end
 
 ;; procedure pour initialiser les bases rouges

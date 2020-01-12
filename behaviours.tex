@@ -34,6 +34,8 @@ La partie offensive de notre stratégie consiste à trouver la base ennemie et s
 	\item Des explorers essaient de trouver une base ennemie. Une fois que ceci est fait, une partie rentre à la base, et l'autre partie attaque. La répartition est déterminée aléatoirement.
         \item Les explorers rentrant informent les autres explorers croisés en chemin, qui attaquent alors la base ennemie.
         \item Les explorers qui attaquent foncent tout droit, sans se préoccuper d'éventuels obstacles en chemin.
+            La décision de ne pas éviter les obstacles vient du fait que c'est un comportement plus amusant.
+            De plus, les attaques suicidaires sont très puissantes, comparées aux missiles, nous n'allons donc pas essayer de pousser notre avantage trop loin.
 \end{itemize}
 
 \subsection{Gestion de la mémoire}
@@ -42,13 +44,13 @@ Les robots sont gérés comme des machines à état.
 La mémoire est gérée différemment selon le type du robot, mais l'emplacement 0 est le même pour les deux, et sert à stocker l'état du robot.
 
 \begin{table}[!htb]
-	Memory assignments for all robots\\
+	Mémoire des robots\\
 	\begin{tabular}{|c|l|}
 		\hline
-		Memory & Description\\
+		Emplacement mémoire & Description\\
 		\hline
-		Mem 0 a & Current State\\
-		Mem 0 b & Time since last state change\\
+		Mem 0 a & État actuel du robot\\
+		Mem 0 b & Temps depuis le dernier changement d'états\\
 		\hline
 	\end{tabular}
 \end{table}
@@ -58,13 +60,13 @@ La mémoire est gérée différemment selon le type du robot, mais l'emplacement
 \subsection{Gestion de la mémoire}
 
 \begin{table}[!htb]
-	Memory assignments for explorers\\
+	Mémoire des explorers\\
 	\begin{tabular}{|c|l|}
 		\hline
-		Memory & Description\\
+		Emplacement mémoire & Description\\
 		\hline
-		Mem 1 a & Food x or Enemy base x\\
-		Mem 1 b & Food y or Enemy base y\\
+		Mem 1 a & Coordonnée en x pour la nourriture ou une base ennemie x\\
+		Mem 1 b & Coordonnée en y pour la nourriture ou une base ennemie\\
 		\hline
 	\end{tabular}
 \end{table}
@@ -72,42 +74,42 @@ La mémoire est gérée différemment selon le type du robot, mais l'emplacement
 \subsection{Gestion des états}
 
 \begin{table}[!htb]
-	State array\\
+	Liste des états\\
 	\begin{tabular}{|c|l|}
 		\hline
-		State & Description \\
+		État & Description \\
 		\hline
-		0 & Wandering : goes in random directions, while trying to dodge objects\\
+		0 & Errance : va dans des directions aléatoires, en évitant les obstacles\\
 		\hline
-		1 & Goes back to base to transmit food info\\
+		1 & Retour à la base, en transmettant des informations sur la nourriture\\
 		\hline
-		2 & Searching enemy base\\
+		2 & Recherche de la base ennemie\\
 		\hline
-		3 & Goes back to base to transmit enemy base location\\
+		3 & Retour à la base, en transmettant la position de la base ennemie\\
 		\hline
-		4 & Suicide mode\\
+		4 & Mode d'attaque, fonce sur la base ennemie tout droit\\
 		\hline
 	\end{tabular}
 \end{table}
 
 \begin{table}[!htb]
-	State transitions\\
+	Transitions d'états\\
 	\begin{tabular}{|c|c|l|}
 		\hline
-		From & To & Conditions\\
+		De & À & Condition\\
 		\hline
-		0 & 1 & Resource in range\\
+		0 & 1 & Ressource à portée\\
 		\hline
-		1 & 2 & Arrived to base\\
+		1 & 2 & Arrivée à la base\\
 		\hline
-		2 & 3 & Find enemy base and random\\
+		2 & 3 & Découverte de la base ennemie, avec une probabilité\\
 		\hline
-		2 & 4 & Find enemy base and random\\
+		2 & 4 & Découverte de la base ennemie, avec une probabilité\\
 		\hline
 	\end{tabular}
 \end{table}
 
-\section{Harvesters behaviour}
+\section{Comportement des harvesters}
 
 
 \subsection{Gestion de la mémoire}
@@ -116,15 +118,15 @@ La principale information que doivent stocker les Harvester est la position de s
 \newline
 
 \begin{table}[!htb]
-	Memory assignments for harvesters\\
+	Mémoire des harvesters\\
 	\begin{tabular}{|c|l|}
 		\hline
-		Memory & Description\\
+		Emplacement mémoire & Description\\
 		\hline
-		Mem 1 a & Food x\\
-		Mem 1 b & Food y\\
+		Mem 1 a & Nourriture x\\
+		Mem 1 b & Nourriture y\\
 		\hline
-                Mem 2 & Has food been found the previous turn\\
+                Mem 2 & Est-ce que de la nourriture a été trouvée à l'itération précédente\\
                 \hline
 	\end{tabular}
 \end{table}
@@ -134,54 +136,55 @@ La principale information que doivent stocker les Harvester est la position de s
 Nous avons besoin de quatre états : un pour errer aléatoirement, un autre pour récupérer de la nourriture précise, un pour la ramener à la base, et un dernier pour gérer les fermes.
 
 \begin{table}[!htb]
-	State array\\
+	Liste des états\\
 	\begin{tabular}{|c|l|}
 		\hline
-		State & Description \\
+		État & Description \\
 		\hline
-		0 & Wandering : goes in random directions, while trying to dodge objects\\
+		0 & Errance : va dans des directions aléatoires, évite les obstacles\\
 		\hline
-		1 & Collecting : goes to a resource location known or indicated by an Explorer\\
+		1 & Collecte : Se rend vers une nourriture détectée ou indiquée par un autre robot\\
 		\hline
-		2 & Retrieving : brings a resource bask to the base\\
+		2 & Rapporte : rapporte sa cargaison de resources à la base\\
 		\hline
-		3 & Farming : Plant seeds and harvest seeds around base\\
+		3 & Agriculture : Plate des graines et récolte les burgers auour de la base\\
 		\hline
 	\end{tabular}
 \end{table}
 
 Au départ, tous les Harvesters partent explorer.
 Cependant, quand ils rentrent à la base déposer des ressources, il y a une probabilité, gérée par un paramètre, que le harvester se mette à gérer les fermes autour de la base.
+Après avoir récolté un burger, ils continuent de collecter les autres à sa portée tant qu'il y en a.
 \newline
 
 \begin{table}[!htb]
 	Transitions d'état pour les Harvesters\\
 	\begin{tabular}{|c|c|l|}
 		\hline
-		From & To & Conditions\\
+		De & À & Conditions\\
 		\hline
-		0 & 1 & Resource or Explorer knowing resource in range\\
+		0 & 1 & Ressources détectées ou emplacement connu grâce à un autre robot\\
 		\hline
-		1 & 2 & Carries resource\\
+		1 & 2 & Possède des ressources, et n'en a pas trouvé plus à portée\\
 		\hline
-		2 & 3 & Near base\\
+		2 & 3 & Est proche de la base\\
 		\hline
 	\end{tabular}
 \end{table}
 
-\section{Bases behaviour}
+\section{Comportement des bases}
 
 \subsection{Gestion de la mémoire}
 
 Les bases doivent retenir le nombre d'unités encore à produire.
 \begin{table}[!htb]
-	Memory assignments for bases\\
+	Mémoires des bases\\
 	\begin{tabular}{|c|l|}
 		\hline
-		Memory & Description\\
+		Emplacement mémoire & Description\\
 		\hline
-		Mem 1 a & Number of harvesters still to be produce\\
-		Mem 1 b & Number of explorers still to be produced\\
+		Mem 1 a & Nombre de harvesters encore à produire\\
+		Mem 1 b & Nombre d'explorers encore à produire\\
 		\hline
 	\end{tabular}
 \end{table}

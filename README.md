@@ -1,5 +1,5 @@
 # warbot-jin
-An AI for the warbot game we code for a school project
+An AI for the warbot game we developped for a school project
 
 The code is based on the one our teacher gave us, and is meant to work in a [Netlogo](https://ccl.northwestern.edu/netlogo/) project he gave us.
 We had to code some turtles of a faction which would evolve in a world with some resources and an ennemy faction.
@@ -8,7 +8,6 @@ We had to code some turtles of a faction which would evolve in a world with some
 - Code the behaviour of the one faction's turtles
 - Do not rely on any color based function, your faction color can change depending on your opponent
 - The turtles are of types : bases, explorer, harvester and rocket launcher
-- 
 
 ## Restrictions
 - Turtles have limited memory slots (10 in total)
@@ -21,7 +20,7 @@ We had to code some turtles of a faction which would evolve in a world with some
 - Make explorers share information and monitor its propagation
 - Use explorers to find resources and take information to the base
 - Once the base knows where to find resources, search for an enemy base
-- When found, either commit suicide on it or go share the position based on probablities and wether the base knows this base position
+- When found, either commit suicide on it or go share the position based on probabilities and whether the base knows this base position
 - No use of Rocket Launcher
 - Two harvester per base, which try to create farms
 

@@ -1,6 +1,8 @@
 # warbot-jin
 An AI for the warbot game we developped for a school project
 
+![Image of the game](https://github.com/MadEwink/warbot-jin/blob/master/warbot_icon.png)
+
 The code is based on the one our teacher gave us, and is meant to work in a [Netlogo](https://ccl.northwestern.edu/netlogo/) project he gave us.
 We had to code some turtles of a faction which would evolve in a world with some resources and an ennemy faction.
 
